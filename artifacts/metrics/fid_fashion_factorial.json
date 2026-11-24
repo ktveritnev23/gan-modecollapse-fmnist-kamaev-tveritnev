@@ -1,0 +1,173 @@
+{
+ "protocol": {
+  "n_samples": 5000,
+  "batch_size": 50,
+  "feature_dim": 2048,
+  "inception": "pytorch_fid.inception.InceptionV3, block_idx 3, resize+normalize",
+  "distance": "Fréchet distance via eigendecomposition of the symmetric form",
+  "preprocess": "image in [-1,1] -> (x+1)/2 -> repeat to 3 channels -> 299x299",
+  "real_reference": "cached statistics of test split indices 0..4999 (same slices as fid.json)",
+  "latent_seed": 1234,
+  "device": "mps"
+ },
+ "noise_floor": {
+  "dataset": "fashion",
+  "fid_real_vs_real": 5.101735475620842,
+  "n_each": 5000,
+  "note": "два непересекающихся среза по 5000 изображений тестовой части; разница меньше этого порога не значит ничего"
+ },
+ "arms": {
+  "fashion_strongD": {
+   "fid": 140.98820184842285,
+   "dataset": "fashion",
+   "epochs": 40,
+   "params_g": 759873,
+   "params_d": 1129345,
+   "d_over_g": 1.4862286197825163,
+   "max_class_share_last": 0.3408203125,
+   "mode_coverage_last": 0.8,
+   "class_entropy_last": 0.7450953750996494,
+   "intra_class_spread_last": 15.813009857263875,
+   "d_margin_last": 19.347476036120685,
+   "zero_classes_last": [
+    7,
+    9
+   ],
+   "config": {
+    "seed": 42,
+    "z_dim": 100,
+    "batch_size": 128,
+    "lr_g": 0.0002,
+    "lr_d": 0.0002,
+    "beta1": 0.5,
+    "epochs": 40,
+    "n_critic": 5,
+    "lambda_gp": 10.0,
+    "n_eval": 2048,
+    "n_clusters": 20,
+    "threads": 4,
+    "device": "mps",
+    "preload": true,
+    "label": "fashion_strongD",
+    "dataset": "fashion",
+    "model": "vanilla",
+    "g_widths": [
+     128,
+     64
+    ],
+    "d_widths": [
+     128,
+     256
+    ],
+    "d_bn": false,
+    "d_extra": 1
+   }
+  },
+  "fashion_strongD_80ep": {
+   "fid": 84.88051328745706,
+   "dataset": "fashion",
+   "epochs": 80,
+   "params_g": 759873,
+   "params_d": 1129345,
+   "d_over_g": 1.4862286197825163,
+   "max_class_share_last": 0.39794921875,
+   "mode_coverage_last": 0.65,
+   "class_entropy_last": 0.6900172901675898,
+   "intra_class_spread_last": 14.544897192750133,
+   "d_margin_last": 24.370818721942413,
+   "zero_classes_last": [
+    5,
+    7,
+    8,
+    9
+   ],
+   "config": {
+    "seed": 42,
+    "z_dim": 100,
+    "batch_size": 128,
+    "lr_g": 0.0002,
+    "lr_d": 0.0002,
+    "beta1": 0.5,
+    "epochs": 80,
+    "n_critic": 5,
+    "lambda_gp": 10.0,
+    "n_eval": 2048,
+    "n_clusters": 20,
+    "threads": 4,
+    "device": "mps",
+    "preload": true,
+    "label": "fashion_strongD_80ep",
+    "dataset": "fashion",
+    "model": "vanilla",
+    "g_widths": [
+     128,
+     64
+    ],
+    "d_widths": [
+     128,
+     256
+    ],
+    "d_bn": false,
+    "d_extra": 1
+   }
+  },
+  "fashion_strongD_wgan": {
+   "fid": 43.74769846266997,
+   "dataset": "fashion",
+   "epochs": 40,
+   "params_g": 759873,
+   "params_d": 1129345,
+   "d_over_g": 1.4862286197825163,
+   "max_class_share_last": 0.12548828125,
+   "mode_coverage_last": 1.0,
+   "class_entropy_last": 0.9963572772835348,
+   "intra_class_spread_last": 19.152070543877347,
+   "d_margin_last": 2.8596207053742857,
+   "zero_classes_last": [],
+   "config": {
+    "seed": 42,
+    "z_dim": 100,
+    "batch_size": 128,
+    "lr_g": 0.0002,
+    "lr_d": 0.0002,
+    "beta1": 0.5,
+    "epochs": 40,
+    "n_critic": 5,
+    "lambda_gp": 10.0,
+    "n_eval": 2048,
+    "n_clusters": 20,
+    "threads": 4,
+    "device": "mps",
+    "preload": true,
+    "label": "fashion_strongD_wgan",
+    "dataset": "fashion",
+    "model": "wgan",
+    "g_widths": [
+     128,
+     64
+    ],
+    "d_widths": [
+     128,
+     256
+    ],
+    "d_bn": true,
+    "d_extra": 1
+   }
+  }
+ },
+ "notes": [
+  "Абсолютные значения FID здесь несравнимы с публикуемыми: 28x28 в оттенках серого растянуто до 299x299 RGB, а Inception обучен на ImageNet.",
+  "Сравнивать можно только эти три плеча между собой и с порогом шума FD(real↔real) на Fashion-MNIST.",
+  "Новый файл, чтобы не перезаписывать artifacts/metrics/fid.json прошлого прогона."
+ ],
+ "absurdity_check": {
+  "collapsed_arms": [
+   "fashion_strongD_80ep"
+  ],
+  "lowest_fid_arm": "fashion_strongD_wgan",
+  "verdict": "FID у коллапснувших плеч не лучший: совпадает с ожиданием",
+  "note": "FID награждает гладкие 'типичные' сэмплы и не различает коллапс: одно доминирующее платье фотографично и близко к среднему, но разнообразия нет — поэтому рядом стоят покрытие и энтропия классов."
+ },
+ "seconds_total": 64.3,
+ "generated_utc": "2026-11-24 07:11:24 UTC"
+}
